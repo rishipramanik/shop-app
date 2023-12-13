@@ -13,6 +13,7 @@ import {
 import colors from '../constants/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, updateCart } from '../store/slices/cartSlice';
+import { cartState } from '../store';
 // import Carousel from 'react-native-reanimated-carousel';
 // import Swiper from 'react-native-swiper';
 
@@ -22,9 +23,6 @@ const ProductDetailsScreen = ({ route, navigation }) => {
 
   const [productDetails, setProductDetails] = useState([]);
   const [isLoading, setLoading] = useState(false);
-  // const items = useSelector((state) => state.cart);
-
-  // const addedItems = items.map((ele) => ele.id);
 
   const handleAddToCart = (item) => {
     dispatch(addToCart(item));

@@ -1,4 +1,4 @@
-import { PayloadAction, combineReducers, createSlice } from '@reduxjs/toolkit';
+import { combineReducers, createSlice } from '@reduxjs/toolkit';
 
 const initialCartState = {
   items: [],
@@ -29,14 +29,17 @@ const cartSlice = createSlice({
     removeFromCart: (state, action) => {
       const checkItem = state.items.find((item) => item.id === action.payload);
       if (checkItem) {
-        checkItem.quantity -= 1;
+        if (checkItem.quantity < 2) {
+          const toRemove = state.items.indexOf(checkItem);
+          state.items.splice(toRemove, 1);
+        } else {
+          checkItem.quantity -= 1;
+        }
       }
     },
   },
 });
 
-export const { addToCart, removeFromCart, updateCart } = cartSlice.actions;
+export const { addToCart, removeFromCart } = cartSlice.actions;
 
-export const rootReducer = combineReducers({
-  cart: cartSlice.reducer,
-});
+export default cartSlice.reducer;

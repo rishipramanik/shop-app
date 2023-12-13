@@ -5,19 +5,22 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  SafeAreaView,
   StyleSheet,
-  ScrollView,
   ActivityIndicator,
   TextInput,
 } from 'react-native';
 import { colors } from '../constants/colors';
-import { MaterialIcons } from '@expo/vector-icons';
 import IconButton from '../components/UI/IconButton';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateFavorite } from '../store/slices/favoritesSlice';
 
 const HomeScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const fav = useSelector((state) => state.fav.items);
+  const dispatch = useDispatch();
+  const favs = fav.map((item) => item.id).sort((a, b) => a - b);
+  console.log(fav);
 
   useEffect(() => {
     // Fetch products from the API
@@ -36,15 +39,30 @@ const HomeScreen = ({ navigation }) => {
     fetchProductList();
   }, []);
 
+  const handleUpdateFav = (item) => {
+    dispatch(updateFavorite(item));
+  };
+
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.Item}
-      onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
-    >
-      <Image source={{ uri: item.thumbnail }} style={styles.Image} />
-      <Text style={styles.price}>${item.price}</Text>
-      <Text style={styles.title}>{item.title}</Text>
-    </TouchableOpacity>
+    <View style={styles.Item}>
+      <View style={styles.heart}>
+        <IconButton
+          icon={
+            favs.find((f) => f === item.id) ? 'favorite' : 'favorite-border'
+          }
+          size={24}
+          color={colors.customColor2}
+          onPress={() => handleUpdateFav(item)}
+        />
+      </View>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
+      >
+        <Image source={{ uri: item.thumbnail }} style={styles.Image} />
+        <Text style={styles.price}>${item.price}</Text>
+        <Text style={styles.title}>{item.title}</Text>
+      </TouchableOpacity>
+    </View>
   );
 
   if (isLoading) {
@@ -147,11 +165,14 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 15,
   },
+  heart: {
+    alignItems: 'left',
+  },
   Image: {
     height: 68,
     width: 68,
     marginHorizontal: 40,
-    marginVertical: 40,
+    marginVertical: 15,
     borderRadius: 5,
   },
   price: {

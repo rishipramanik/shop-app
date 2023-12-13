@@ -3,7 +3,6 @@ import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
   SafeAreaView,
   StyleSheet,
   Pressable,
@@ -24,7 +23,6 @@ const CartScreen = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
   const [total, setTotal] = useState(() => calculateTotal(cartItems));
-  console.log(cartItems, total, '!!');
 
   const handleAddition = (item) => {
     dispatch(addToCart(item));
@@ -64,30 +62,36 @@ const CartScreen = () => {
 
   return (
     <SafeAreaView style={{ height: '100%', backgroundColor: colors.white }}>
-      <FlatList
-        data={cartItems}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
+      {cartItems.length > 0 ? (
+        <FlatList
+          data={cartItems}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      ) : (
+        <Text style={styles.noText}>No Items</Text>
+      )}
       <View style={styles.totalContainer}>
         <View style={styles.totalTextContainer}>
           <Text style={styles.text}>Subtotal:</Text>
           <Text style={styles.text}>${total}</Text>
         </View>
-        <View style={styles.totalTextContainer}>
-          <Text style={styles.text}>Delivery:</Text>
-          <Text style={styles.text}>$2</Text>
-        </View>
-        <View style={styles.totalTextContainer}>
-          <Text style={styles.text}>Total:</Text>
-          <Text style={styles.text}>${total + 2}</Text>
-        </View>
+        {total !== 0 && (
+          <>
+            <View style={styles.totalTextContainer}>
+              <Text style={styles.text}>Delivery:</Text>
+              <Text style={styles.text}>$2</Text>
+            </View>
+            <View style={styles.totalTextContainer}>
+              <Text style={styles.text}>Total:</Text>
+              <Text style={styles.text}>${total + 2}</Text>
+            </View>
+          </>
+        )}
         <Pressable style={styles.proceed}>
           <Text style={styles.ptext}>Proceed to Checkout</Text>
         </Pressable>
       </View>
-
-      {/* Purchase button */}
     </SafeAreaView>
   );
 };
@@ -126,6 +130,12 @@ const styles = StyleSheet.create({
   ptext: {
     fontSize: 16,
     color: colors.white,
+  },
+  noText: {
+    fontSize: 18,
+    color: colors.primary,
+    marginHorizontal: '40%',
+    marginVertical: 30,
   },
   quantity: {
     width: '30%',

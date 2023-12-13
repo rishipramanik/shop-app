@@ -4,6 +4,7 @@ import colors from '../constants/colors';
 import HomeScreen from '../screens/HomeScreen';
 import Favorites from '../screens/Favorites';
 import { MaterialIcons } from '@expo/vector-icons';
+import Categories from '../screens/Categories';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,7 +43,7 @@ const BottomTabNavigation = () => {
       />
       <Tab.Screen
         name='Categories'
-        component={HomeScreen}
+        component={Categories}
         options={{
           tabBarIcon: ({ focused }) => {
             return (
@@ -72,7 +73,7 @@ const BottomTabNavigation = () => {
       />
       <Tab.Screen
         name='More'
-        component={Favorites}
+        component={Categories}
         options={{
           tabBarIcon: ({ focused }) => {
             return (
