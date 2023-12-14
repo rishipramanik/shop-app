@@ -11,7 +11,6 @@ const favoriteSlice = createSlice({
     updateFavorite: (state, action) => {
       const { id, title, thumbnail, price } = action.payload;
       const existingFav = state.items.find((item) => item.id === id);
-      console.log(existingFav);
       if (existingFav) {
         const toRemove = state.items.indexOf(existingFav);
         state.items.splice(toRemove, 1);

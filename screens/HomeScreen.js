@@ -3,24 +3,21 @@ import {
   View,
   Text,
   FlatList,
-  Image,
-  TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
   TextInput,
 } from 'react-native';
 import { colors } from '../constants/colors';
 import IconButton from '../components/UI/IconButton';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateFavorite } from '../store/slices/favoritesSlice';
+import { useSelector } from 'react-redux';
+import ProductCard from '../components/UI/Dashboard/ProductCard';
+import Badge from '../components/UI/Badge';
+import Corousel from '../components/UI/Dashboard/Corousel';
 
 const HomeScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const fav = useSelector((state) => state.fav.items);
-  const dispatch = useDispatch();
-  const favs = fav.map((item) => item.id).sort((a, b) => a - b);
-  console.log(fav);
+  const cartItems = useSelector((state) => state.cart.items);
 
   useEffect(() => {
     // Fetch products from the API
@@ -30,6 +27,7 @@ const HomeScreen = ({ navigation }) => {
         const request = await fetch('https://dummyjson.com/products');
         const response = await request.json();
         setProducts(response?.products);
+        console.log(products);
       } catch (e) {
         console.error(e);
       } finally {
@@ -39,54 +37,40 @@ const HomeScreen = ({ navigation }) => {
     fetchProductList();
   }, []);
 
-  const handleUpdateFav = (item) => {
-    dispatch(updateFavorite(item));
-  };
-
   const renderItem = ({ item }) => (
-    <View style={styles.Item}>
-      <View style={styles.heart}>
-        <IconButton
-          icon={
-            favs.find((f) => f === item.id) ? 'favorite' : 'favorite-border'
-          }
-          size={24}
-          color={colors.customColor2}
-          onPress={() => handleUpdateFav(item)}
-        />
-      </View>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
-      >
-        <Image source={{ uri: item.thumbnail }} style={styles.Image} />
-        <Text style={styles.price}>${item.price}</Text>
-        <Text style={styles.title}>{item.title}</Text>
-      </TouchableOpacity>
-    </View>
+    <ProductCard product={item} navigation={navigation} />
   );
 
   if (isLoading) {
-    return <ActivityIndicator size='large' />;
+    return (
+      <View style={styles.fallBack}>
+        <ActivityIndicator size='large' />
+      </View>
+    );
   }
 
   return (
     <View style={{ backgroundColor: colors.white }}>
-      <View style={styles.TopContainer}>
-        <View style={styles.NameContainer}>
-          <Text style={styles.Header}>Hey Rahul,</Text>
-          <IconButton
-            icon='shopping-cart'
-            size={24}
-            color={colors.white}
-            onPress={() => navigation.navigate('Cart')}
+      <View style={styles.topContainer}>
+        <View style={styles.nameContainer}>
+          <Text style={styles.header}>Hey Rahul,</Text>
+          <View>
+            {cartItems.length > 0 && <Badge count={cartItems.length} />}
+            <IconButton
+              icon='shopping-cart'
+              size={24}
+              color={colors.white}
+              onPress={() => navigation.navigate('Cart')}
+            />
+          </View>
+        </View>
+        <View style={styles.searchBox}>
+          <TextInput
+            style={styles.textBox}
+            placeholder='Search Products or store'
           />
         </View>
-
-        <TextInput
-          style={styles.SearchBox}
-          placeholder='Search Products or store'
-        />
-        <View style={styles.DeliveryDetails}>
+        <View style={styles.deliveryDetails}>
           <View>
             <Text style={styles.info}>DELIVERY TO</Text>
             <Text style={styles.data}>Green Way 3000, Sylhet</Text>
@@ -97,7 +81,8 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </View>
       </View>
-      <Text style={styles.Header1}>Recommended</Text>
+      <Corousel />
+      <Text style={styles.header1}>Recommended</Text>
       <FlatList
         data={products}
         renderItem={renderItem}
@@ -111,37 +96,43 @@ const HomeScreen = ({ navigation }) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  TopContainer: {
-    height: '25%',
+  fallBack: {
+    marginVertical: '70%',
+  },
+  topContainer: {
+    height: 280,
     paddingTop: '15%',
     backgroundColor: colors.primary,
     justifyContent: 'space-between',
   },
-  NameContainer: {
+  nameContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 15,
   },
-  Header: {
+  header: {
     fontSize: 30,
-    fontWeight: 800,
+    fontWeight: '700',
     color: colors.white,
   },
-  Header1: {
+  header1: {
     fontSize: 30,
-    fontWeight: 800,
+    fontWeight: '300',
     marginLeft: 15,
     marginTop: 10,
   },
-  SearchBox: {
+  searchBox: {
     borderRadius: 30,
     height: '25%',
     paddingHorizontal: 20,
     marginHorizontal: 15,
     backgroundColor: colors.primaryDark,
   },
-  DeliveryDetails: {
+  textBox: {
+    color: colors.white,
+  },
+  deliveryDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -150,39 +141,11 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 12,
-    fontWeight: 800,
+    fontWeight: '700',
     color: colors.buttonDisabled,
   },
   data: {
     fontSize: 14,
     color: colors.white,
-  },
-  Item: {
-    width: 160,
-    height: 195,
-    borderRadius: 10,
-    backgroundColor: colors.greyScale,
-    marginVertical: 10,
-    marginHorizontal: 15,
-  },
-  heart: {
-    alignItems: 'left',
-  },
-  Image: {
-    height: 68,
-    width: 68,
-    marginHorizontal: 40,
-    marginVertical: 15,
-    borderRadius: 5,
-  },
-  price: {
-    fontWeight: 600,
-    fontSize: 14,
-    marginLeft: 10,
-  },
-  title: {
-    marginLeft: 10,
-    fontWeight: 400,
-    color: '#616A7D',
   },
 });

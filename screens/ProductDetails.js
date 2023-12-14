@@ -7,25 +7,37 @@ import {
   StyleSheet,
   ActivityIndicator,
   Dimensions,
-  FlatList,
   TouchableOpacity,
 } from 'react-native';
 import colors from '../constants/colors';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart, updateCart } from '../store/slices/cartSlice';
-import { cartState } from '../store';
-// import Carousel from 'react-native-reanimated-carousel';
-// import Swiper from 'react-native-swiper';
+import { addToCart } from '../store/slices/cartSlice';
+import { updateFavorite } from '../store/slices/favoritesSlice';
+import Carousel from 'react-native-snap-carousel';
+import IconButton from '../components/UI/IconButton';
+import Badge from '../components/UI/Badge';
 
 const ProductDetailsScreen = ({ route, navigation }) => {
   const { id } = route.params;
   const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items);
+  const fav = useSelector((state) => state.fav.items);
+  const favs = fav.map((item) => item.id).sort((a, b) => a - b);
 
   const [productDetails, setProductDetails] = useState([]);
   const [isLoading, setLoading] = useState(false);
 
+  const handleUpdateFav = (item) => {
+    dispatch(updateFavorite(item));
+  };
+
   const handleAddToCart = (item) => {
     dispatch(addToCart(item));
+  };
+
+  const handleBuyNow = (item) => {
+    handleAddToCart(item);
+    navigation.navigate('Cart');
   };
 
   useEffect(() => {
@@ -42,7 +54,7 @@ const ProductDetailsScreen = ({ route, navigation }) => {
       }
     };
     fetchProductData();
-  }, []);
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -52,15 +64,65 @@ const ProductDetailsScreen = ({ route, navigation }) => {
     );
   }
 
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: item }} style={styles.itemImage} />
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor: colors.white }}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>{productDetails.title}</Text>
+      <View style={styles.navigationBar}>
+        <IconButton
+          icon='arrow-back-ios'
+          size={24}
+          color={colors.primary}
+          onPress={() => navigation.navigate('Home')}
+        />
+        <View>
+          {cartItems.length > 0 && <Badge count={cartItems.length} />}
+          <IconButton
+            icon='shopping-cart'
+            size={24}
+            color={colors.primary}
+            onPress={() => navigation.navigate('Cart')}
+          />
+        </View>
       </View>
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: productDetails.thumbnail }}
-          style={styles.itemImage}
+      <View style={styles.titleContainer}>
+        {productDetails?.title?.length > 11 ? (
+          <>
+            <Text style={styles.title}>
+              {productDetails.title.substr(0, 11)}
+            </Text>
+            <Text style={styles.title2}>{productDetails.title.substr(11)}</Text>
+          </>
+        ) : (
+          <Text style={styles.title}>{productDetails.title}</Text>
+        )}
+      </View>
+      <View style={styles.middleContainer}>
+        <View style={styles.favBtn}>
+          <IconButton
+            icon={
+              favs.find((f) => f === productDetails.id)
+                ? 'favorite'
+                : 'favorite-border'
+            }
+            size={24}
+            color={colors.customColor2}
+            onPress={() => handleUpdateFav(productDetails)}
+          />
+        </View>
+        <Carousel
+          data={productDetails.images}
+          renderItem={renderItem}
+          sliderWidth={Dimensions.get('window').width}
+          itemWidth={Dimensions.get('window').width - 40}
+          loop={true}
+          autoplay={true}
         />
       </View>
 
@@ -74,13 +136,13 @@ const ProductDetailsScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.pBtn}
-          onPress={() => navigation.navigate('Cart')}
+          onPress={() => handleBuyNow(productDetails)}
         >
           <Text style={styles.pText}>Buy Now</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.detailsContainer}>
-        <Text style={{ fontSize: 20, fontWeight: 600 }}>Details</Text>
+        <Text style={{ fontSize: 20, fontWeight: '600' }}>Details</Text>
         <Text style={styles.description}>{productDetails.description}</Text>
       </View>
     </SafeAreaView>
@@ -93,42 +155,58 @@ const styles = StyleSheet.create({
   fallBack: {
     marginVertical: '70%',
   },
-  titleContainer: {
-    marginVertical: 20,
+  navigationBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginHorizontal: 15,
+    marginVertical: 20,
+  },
+  titleContainer: {
+    marginVertical: 10,
+    marginHorizontal: 20,
   },
   title: {
     fontSize: 50,
-    fontWeight: 700,
+    fontWeight: '700',
   },
-  wrapper: {},
-  // slide: {
-  //   // flex: 1,
-  //   // justifyContent: 'center',
-  //   // alignItems: 'center',
-  // },
+  title2: {
+    fontSize: 50,
+    fontWeight: '300',
+  },
   imageContainer: {
     width: '100%',
+  },
+  middleContainer: {
+    alignItems: 'flex-end',
+  },
+  favBtn: {
+    backgroundColor: colors.white,
+    width: 70,
+    height: 50,
+    borderRadius: 10,
   },
   itemImage: {
     width: '100%',
     height: 207,
-    objectFit: 'cover',
+    objectFit: 'contain',
   },
   price: {
-    margin: 15,
+    marginVertical: 15,
+    marginHorizontal: 20,
     fontSize: 24,
-    fontWeight: 600,
+    fontWeight: '600',
   },
   detailsContainer: {
-    margin: 15,
+    marginVertical: 15,
+    marginHorizontal: 20,
   },
   description: {
     marginVertical: 10,
     fontSize: 15,
   },
   buttonContainer: {
-    marginHorizontal: 15,
+    marginHorizontal: 20,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',

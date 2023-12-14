@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   update: {
     width: 40,
     padding: 12,
-    borderRadius: '50%',
+    borderRadius: 50,
     alignItems: 'center',
     backgroundColor: colors.greyScale,
   },

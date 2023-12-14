@@ -17,7 +17,7 @@ export const colors = {
 
   // Text Colors
   text: '#2c3e50',
-  textLight: '#ecf0f1',
+  textLight: '#616A7D',
 
   // Button Colors
   buttonPrimary: '#3498db',
