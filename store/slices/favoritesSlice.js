@@ -1,4 +1,4 @@
-import { combineReducers, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialFavState = {
   items: [],
@@ -10,6 +10,7 @@ const favoriteSlice = createSlice({
   reducers: {
     updateFavorite: (state, action) => {
       const { id, title, thumbnail, price } = action.payload;
+      //if item is already set to favorite, remove it from favorite array
       const existingFav = state.items.find((item) => item.id === id);
       if (existingFav) {
         const toRemove = state.items.indexOf(existingFav);
@@ -21,12 +22,6 @@ const favoriteSlice = createSlice({
           thumbnail,
           price,
         });
-      }
-    },
-    renoveFavorite: (state, action) => {
-      const checkItem = state.items.find((item) => item.id === action.payload);
-      if (checkItem) {
-        checkItem.quantity -= 1;
       }
     },
   },

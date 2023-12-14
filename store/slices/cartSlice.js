@@ -1,4 +1,4 @@
-import { combineReducers, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialCartState = {
   items: [],
@@ -29,6 +29,7 @@ const cartSlice = createSlice({
     removeFromCart: (state, action) => {
       const checkItem = state.items.find((item) => item.id === action.payload);
       if (checkItem) {
+        //if the item quantity is less than 2 remove the item object from array
         if (checkItem.quantity < 2) {
           const toRemove = state.items.indexOf(checkItem);
           state.items.splice(toRemove, 1);

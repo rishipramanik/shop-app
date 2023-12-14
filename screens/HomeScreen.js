@@ -40,6 +40,7 @@ const HomeScreen = ({ navigation }) => {
     <ProductCard product={item} navigation={navigation} />
   );
 
+  // show loader in case of loading
   if (isLoading) {
     return (
       <View style={styles.fallBack}>

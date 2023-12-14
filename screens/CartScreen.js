@@ -31,6 +31,7 @@ const CartScreen = () => {
     dispatch(removeFromCart(item.id));
   };
 
+  //update total each time the cartitem gets updated
   useEffect(() => {
     setTotal(calculateTotal(cartItems));
   }, [cartItems]);

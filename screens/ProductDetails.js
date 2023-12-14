@@ -43,6 +43,7 @@ const ProductDetailsScreen = ({ route, navigation }) => {
     navigation.navigate('Cart');
   };
 
+  //fetch the product details with the productId
   useEffect(() => {
     const fetchProductData = async () => {
       setLoading(true);
@@ -59,14 +60,6 @@ const ProductDetailsScreen = ({ route, navigation }) => {
     fetchProductData();
   }, [id]);
 
-  if (isLoading) {
-    return (
-      <View style={styles.fallBack}>
-        <ActivityIndicator size='large' />
-      </View>
-    );
-  }
-
   const renderItem = ({ item }) => {
     return (
       <View style={styles.imageContainer}>
@@ -74,6 +67,14 @@ const ProductDetailsScreen = ({ route, navigation }) => {
       </View>
     );
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.fallBack}>
+        <ActivityIndicator size='large' />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView>
