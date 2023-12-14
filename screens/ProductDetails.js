@@ -2,20 +2,19 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
-  Image,
   SafeAreaView,
   StyleSheet,
   ActivityIndicator,
-  Dimensions,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import colors from '../constants/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../store/slices/cartSlice';
 import { updateFavorite } from '../store/slices/favoritesSlice';
-import Carousel from 'react-native-snap-carousel';
 import IconButton from '../components/UI/IconButton';
 import Badge from '../components/UI/Badge';
+import SlideItem from '../components/UI/SlideItem';
 
 const ProductDetailsScreen = ({ route, navigation }) => {
   const { id } = route.params;
@@ -59,14 +58,6 @@ const ProductDetailsScreen = ({ route, navigation }) => {
     };
     fetchProductData();
   }, [id]);
-
-  const renderItem = ({ item }) => {
-    return (
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: item }} style={styles.itemImage} />
-      </View>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -123,14 +114,17 @@ const ProductDetailsScreen = ({ route, navigation }) => {
               onPress={() => handleUpdateFav(productDetails)}
             />
           </View>
-          <Carousel
-            data={productDetails.images}
-            renderItem={renderItem}
-            sliderWidth={Dimensions.get('window').width}
-            itemWidth={Dimensions.get('window').width - 40}
-            loop={true}
-            autoplay={true}
-          />
+          {productDetails?.images?.length > 0 && (
+            <View style={{ width: '100%' }}>
+              <FlatList
+                data={productDetails.images}
+                renderItem={({ item }) => <SlideItem item={item} />}
+                horizontal
+                pagingEnabled
+                snapToAlignment='center'
+              />
+            </View>
+          )}
         </View>
 
         <Text style={styles.price}>${productDetails.price}</Text>
@@ -185,9 +179,6 @@ const styles = StyleSheet.create({
     fontSize: 50,
     fontWeight: '300',
   },
-  imageContainer: {
-    width: '100%',
-  },
   middleContainer: {
     alignItems: 'flex-end',
   },
@@ -196,11 +187,6 @@ const styles = StyleSheet.create({
     width: 70,
     height: 50,
     borderRadius: 10,
-  },
-  itemImage: {
-    width: '100%',
-    height: 207,
-    objectFit: 'contain',
   },
   price: {
     marginVertical: 15,

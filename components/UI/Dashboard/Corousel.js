@@ -1,27 +1,16 @@
-import { View, Dimensions, StyleSheet, Image } from 'react-native';
-import Carousel from 'react-native-snap-carousel';
+import { View, StyleSheet, Image, ScrollView } from 'react-native';
 import Card from '../../../assets/Card.png';
 import React from 'react';
 
-const corouselItems = [Card, Card];
-
-const Corousel = () => {
-  const renderItems = ({ item }) => {
-    return (
-      <View style={styles.imageContainer}>
-        <Image source={item} style={styles.itemImage} />
-      </View>
-    );
-  };
+const Corousel = ({ images }) => {
+  const corouselItems = images ? images : [Card, Card];
   return (
     <View>
-      <Carousel
-        data={corouselItems}
-        renderItem={renderItems}
-        sliderWidth={Dimensions.get('window').width}
-        itemWidth={Dimensions.get('window').width - 100}
-        loop={true}
-      />
+      <ScrollView style={styles.imageContainer} horizontal>
+        {corouselItems.map((item, i) => (
+          <Image key={i} source={item} style={styles.itemImage} />
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -34,9 +23,10 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   itemImage: {
-    width: '100%',
+    width: 300,
     height: 140,
-    objectFit: 'contain',
+    objectFit: 'cover',
     borderRadius: 30,
+    marginHorizontal: 20,
   },
 });
