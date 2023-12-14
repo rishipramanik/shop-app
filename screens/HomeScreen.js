@@ -27,7 +27,6 @@ const HomeScreen = ({ navigation }) => {
         const request = await fetch('https://dummyjson.com/products');
         const response = await request.json();
         setProducts(response?.products);
-        console.log(products);
       } catch (e) {
         console.error(e);
       } finally {
@@ -68,6 +67,7 @@ const HomeScreen = ({ navigation }) => {
           <TextInput
             style={styles.textBox}
             placeholder='Search Products or store'
+            placeholderTextColor={colors.white}
           />
         </View>
         <View style={styles.deliveryDetails}>
@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginHorizontal: 15,
     backgroundColor: colors.primaryDark,
+    justifyContent: 'center',
   },
   textBox: {
     color: colors.white,

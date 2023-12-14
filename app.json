@@ -25,6 +25,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "46afa2d2-29eb-418f-ae17-966a0e65c8b1"
+      }
+    },
+    "owner": "rishipra"
   }
 }

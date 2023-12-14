@@ -19,7 +19,7 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen
-              name='BottmTabNavigator'
+              name='BottomTabNavigator'
               component={BottomTabNavigation}
               options={{ headerShown: false }}
             />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -21,8 +21,11 @@ const ProductDetailsScreen = ({ route, navigation }) => {
   const { id } = route.params;
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
-  const fav = useSelector((state) => state.fav.items);
-  const favs = fav.map((item) => item.id).sort((a, b) => a - b);
+  const favItems = useSelector((state) => state.fav.items);
+  const favs = useMemo(
+    () => favItems.map((item) => item.id).sort((a, b) => a - b),
+    [favItems]
+  );
 
   const [productDetails, setProductDetails] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -73,77 +76,81 @@ const ProductDetailsScreen = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: colors.white }}>
-      <View style={styles.navigationBar}>
-        <IconButton
-          icon='arrow-back-ios'
-          size={24}
-          color={colors.primary}
-          onPress={() => navigation.navigate('Home')}
-        />
-        <View>
-          {cartItems.length > 0 && <Badge count={cartItems.length} />}
+    <SafeAreaView>
+      <View style={styles.container}>
+        <View style={styles.navigationBar}>
           <IconButton
-            icon='shopping-cart'
+            icon='arrow-back-ios'
             size={24}
             color={colors.primary}
-            onPress={() => navigation.navigate('Cart')}
+            onPress={() => navigation.navigate('Home')}
+          />
+          <View>
+            {cartItems.length > 0 && <Badge count={cartItems.length} />}
+            <IconButton
+              icon='shopping-cart'
+              size={24}
+              color={colors.primary}
+              onPress={() => navigation.navigate('Cart')}
+            />
+          </View>
+        </View>
+        <View style={styles.titleContainer}>
+          {productDetails?.title?.length > 11 ? (
+            <>
+              <Text style={styles.title}>
+                {productDetails.title.substr(0, 11)}
+              </Text>
+              <Text style={styles.title2}>
+                {productDetails.title.substr(11)}
+              </Text>
+            </>
+          ) : (
+            <Text style={styles.title}>{productDetails.title}</Text>
+          )}
+        </View>
+        <View style={styles.middleContainer}>
+          <View style={styles.favBtn}>
+            <IconButton
+              icon={
+                favs.find((f) => f === productDetails.id)
+                  ? 'favorite'
+                  : 'favorite-border'
+              }
+              size={24}
+              color={colors.customColor2}
+              onPress={() => handleUpdateFav(productDetails)}
+            />
+          </View>
+          <Carousel
+            data={productDetails.images}
+            renderItem={renderItem}
+            sliderWidth={Dimensions.get('window').width}
+            itemWidth={Dimensions.get('window').width - 40}
+            loop={true}
+            autoplay={true}
           />
         </View>
-      </View>
-      <View style={styles.titleContainer}>
-        {productDetails?.title?.length > 11 ? (
-          <>
-            <Text style={styles.title}>
-              {productDetails.title.substr(0, 11)}
-            </Text>
-            <Text style={styles.title2}>{productDetails.title.substr(11)}</Text>
-          </>
-        ) : (
-          <Text style={styles.title}>{productDetails.title}</Text>
-        )}
-      </View>
-      <View style={styles.middleContainer}>
-        <View style={styles.favBtn}>
-          <IconButton
-            icon={
-              favs.find((f) => f === productDetails.id)
-                ? 'favorite'
-                : 'favorite-border'
-            }
-            size={24}
-            color={colors.customColor2}
-            onPress={() => handleUpdateFav(productDetails)}
-          />
-        </View>
-        <Carousel
-          data={productDetails.images}
-          renderItem={renderItem}
-          sliderWidth={Dimensions.get('window').width}
-          itemWidth={Dimensions.get('window').width - 40}
-          loop={true}
-          autoplay={true}
-        />
-      </View>
 
-      <Text style={styles.price}>${productDetails.price}</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.sBtn}
-          onPress={() => handleAddToCart(productDetails)}
-        >
-          <Text style={styles.sText}>Add to Cart</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.pBtn}
-          onPress={() => handleBuyNow(productDetails)}
-        >
-          <Text style={styles.pText}>Buy Now</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.detailsContainer}>
-        <Text style={{ fontSize: 20, fontWeight: '600' }}>Details</Text>
-        <Text style={styles.description}>{productDetails.description}</Text>
+        <Text style={styles.price}>${productDetails.price}</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.sBtn}
+            onPress={() => handleAddToCart(productDetails)}
+          >
+            <Text style={styles.sText}>Add to Cart</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.pBtn}
+            onPress={() => handleBuyNow(productDetails)}
+          >
+            <Text style={styles.pText}>Buy Now</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.detailsContainer}>
+          <Text style={{ fontSize: 20, fontWeight: '600' }}>Details</Text>
+          <Text style={styles.description}>{productDetails.description}</Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -155,12 +162,15 @@ const styles = StyleSheet.create({
   fallBack: {
     marginVertical: '70%',
   },
+  container: {
+    backgroundColor: colors.white,
+  },
   navigationBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 15,
-    marginVertical: 20,
+    marginVertical: 30,
   },
   titleContainer: {
     marginVertical: 10,

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { Text, StyleSheet, SafeAreaView } from 'react-native';
 import React from 'react';
 import colors from '../constants/colors';
 
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   container: {},
   header: {
     marginHorizontal: 15,
-    marginTop: 15,
+    marginTop: 45,
     fontSize: 30,
     color: colors.primary,
   },
